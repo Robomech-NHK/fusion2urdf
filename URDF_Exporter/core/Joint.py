@@ -99,6 +99,13 @@ class Joint:
 
         self.tran_xml = "\n".join(utils.prettify(tran).split("\n")[1:])
 
+def normalize(name):
+    name = re.sub('[ :()]', '_', name)
+
+    if 'base_link' in name:
+        return 'base_link'
+
+    return name
 
 def make_joints_dict(root, msg):
     """
@@ -251,5 +258,13 @@ def make_joints_dict(root, msg):
                     msg = joint.name + " doesn't have joint origin. Please set it and run again."
                     break
     
+
+            parent_occ = get_parent(joint.occurrenceOne)
+            child_occ  = get_parent(joint.occurrenceTwo)
+
+            joint_dict['parent'] = normalize(parent_occ.name)
+            joint_dict['child']  = normalize(child_occ.name)
+
             joints_dict[joint.name] = joint_dict
+
     return joints_dict, msg

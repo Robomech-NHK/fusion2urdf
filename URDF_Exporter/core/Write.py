@@ -126,17 +126,58 @@ to swap component1<=>component2"
             f.write(joint.joint_xml)
             f.write('\n')
 
-def write_gazebo_endtag(file_name):
+def write_gazebo_endtag(file_name, robot_name, joints_dict):
     """
-    Write about gazebo_plugin and the </robot> tag at the end of the urdf
-    
-    
+    Write gazebo plugin blocks and the </robot> tag at the end of the urdf
+
     Parameters
     ----------
     file_name: str
         urdf full path
+    robot_name: str
+        name of the robot (used in xacro variables)
     """
     with open(file_name, mode='a') as f:
+        f.write('\n')
+        f.write('<!-- ros2_control plugin config (keep velocity interfaces compatible with existing controllers) -->\n')
+        f.write('<ros2_control name="GazeboSystem" type="system">\n')
+        f.write('  <hardware>\n')
+        f.write('    <plugin>gz_ros2_control/GazeboSimSystem</plugin>\n')
+        f.write('  </hardware>\n')
+        f.write('\n')
+        # generate joint entries from joints_dict for non-fixed joints
+        for j in joints_dict:
+            try:
+                joint_type = joints_dict[j]['type']
+            except Exception:
+                joint_type = None
+            if joint_type != 'fixed':
+                f.write(f'  <joint name="{j}">\n')
+                f.write('    <command_interface name="velocity"/>\n')
+                f.write('    <state_interface name="position"/>\n')
+                f.write('    <state_interface name="velocity"/>\n')
+                f.write('  </joint>\n')
+                f.write('\n')
+        f.write('\n')
+        f.write('</ros2_control>\n')
+        f.write('\n')
+        f.write('<gazebo>\n')
+        f.write('  <plugin filename="libgz_ros2_control-system.so" name="gz_ros2_control::GazeboSimROS2ControlPlugin">\n')
+        f.write('    <parameters>$(find gazebo_simulator)/config/controller_${robot_name}.yaml</parameters>\n')
+        f.write('  </plugin>\n')
+        f.write('</gazebo>\n')
+        f.write('\n')
+        f.write('<gazebo>\n')
+        f.write('  <plugin\n')
+        f.write('    filename="libgz-sim-pose-publisher-system.so"\n')
+        f.write('    name="gz::sim::systems::PosePublisher">\n')
+        f.write('    <publish_link_pose>true</publish_link_pose>\n')
+        f.write('    <publish_model_pose>true</publish_model_pose>\n')
+        f.write('    <use_pose_vector_msg>true</use_pose_vector_msg>\n')
+        f.write('    <update_frequency>50</update_frequency>\n')
+        f.write('  </plugin>\n')
+        f.write('</gazebo>\n')
+        f.write('\n')
         f.write('</robot>\n')
         
 
@@ -151,17 +192,20 @@ def write_urdf(joints_dict, links_xyz_dict, inertial_dict, material_dict, packag
 
         f.write('<robot name="{}" xmlns:xacro="http://www.ros.org/wiki/xacro">\n'.format(robot_name))
         f.write('\n')
-        f.write('<xacro:include filename="$(find {})/urdf/materials.xacro" />'.format(package_name))
+        # expose robot_name via xacro arg/property and include model files from gazebo_simulator package
+        f.write('<xacro:property name="robot_name" value="$(arg robot_name)"/>\n')
         f.write('\n')
-        f.write('<xacro:include filename="$(find {})/urdf/{}.trans" />'.format(package_name, robot_name))
+        f.write('<xacro:include filename="$(find gazebo_simulator)/models/${robot_name}/urdf/materials.xacro" />\n')
+        f.write('\n')
+        f.write('<xacro:include filename="$(find gazebo_simulator)/models/${robot_name}/urdf/${robot_name}.trans" />\n')
         f.write('\n')
         if gazebo:
-            f.write('<xacro:include filename="$(find {})/urdf/{}.gazebo" />'.format(package_name, robot_name))
+            f.write('<xacro:include filename="$(find gazebo_simulator)/models/${robot_name}/urdf/${robot_name}.gazebo" />\n')
             f.write('\n')
 
     write_link_urdf(joints_dict, repo, links_xyz_dict, file_name, inertial_dict, material_dict)
     write_joint_urdf(joints_dict, repo, links_xyz_dict, file_name)
-    write_gazebo_endtag(file_name)
+    write_gazebo_endtag(file_name, robot_name, joints_dict)
 
 def write_materials_xacro(color_dict, robot_name, save_dir):
     try: os.mkdir(save_dir + '/urdf')
