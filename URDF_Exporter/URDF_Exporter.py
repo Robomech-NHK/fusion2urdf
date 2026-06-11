@@ -46,7 +46,9 @@ def run(context):
 
         # set the names        
         robot_name = root.name.split()[0].lower()
-        package_name = robot_name # + '_description'
+
+        doc = app.activeDocument
+        package_name = '_'.join(doc.name.split())
         save_dir = utils.file_dialog(ui)
         if save_dir == False:
             ui.messageBox('Fusion2URDF was canceled', title)
