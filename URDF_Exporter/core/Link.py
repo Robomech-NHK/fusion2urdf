@@ -149,13 +149,14 @@ def make_material_dict(root, msg):
         Tell the status 
     """
     def convert_german(str_in):
-        str_in = str_in.replace('ä', 'ae')
-        str_in = str_in.replace( 'ö', 'oe')
-        str_in = str_in.replace( 'ü', 'ue')
-        str_in = str_in.replace( 'Ä', 'Ae')
-        str_in = str_in.replace( 'Ö', 'Oe')
-        str_in = str_in.replace( 'Ü', 'Ue')
-        str_in = str_in.replace( 'ß', 'ss')
+        # Normalize common German characters in appearance names.
+        str_in = str_in.replace('\u00e4', 'ae')
+        str_in = str_in.replace('\u00f6', 'oe')
+        str_in = str_in.replace('\u00fc', 'ue')
+        str_in = str_in.replace('\u00c4', 'Ae')
+        str_in = str_in.replace('\u00d6', 'Oe')
+        str_in = str_in.replace('\u00dc', 'Ue')
+        str_in = str_in.replace('\u00df', 'ss')
         return str_in
     # Get component properties.      
     allOccs = root.occurrences
