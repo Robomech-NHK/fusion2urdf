@@ -56,7 +56,12 @@ def run(context):
         
         appWin=tk.Tk()
         appWin.title("Choose your ROS Version")
-        appWin.attributes('-toolwindow', True)
+        # `-toolwindow` is a Windows-only Tk attribute. On macOS it can raise
+        # a TclError, so keep the dialog portable by falling back silently.
+        try:
+            appWin.attributes('-toolwindow', True)
+        except tk.TclError:
+            pass
         appWin.geometry('300x150')
 
         ros_selection = tk.IntVar()
