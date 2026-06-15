@@ -44,11 +44,12 @@ def run(context):
         root = design.rootComponent  # root component 
         components = design.allComponents
 
-        # set the names        
-        robot_name = root.name.split()[0].lower()
+        # # set the names        
+        # robot_name = root.name.split()[0].lower()
 
         doc = app.activeDocument
         package_name = '_'.join(doc.name.split())
+        robot_name = package_name
         save_dir = utils.file_dialog(ui)
         if save_dir == False:
             ui.messageBox('Fusion2URDF was canceled', title)
