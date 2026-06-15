@@ -219,7 +219,7 @@ def make_material_dict(root, msg):
             if prop:
                 color_name = convert_german(prop_name).replace("Farbe - ","").replace("Color - ","")
                 color_name = ("".join(re.findall(r"[A-Za-z0-9 ]*", color_name)))
-                color_name = re.sub('\s+',' ',color_name)
+                color_name = re.sub(r'\s+', ' ', color_name)
                 color_name.strip()
                 color_name = re.sub('[ :()]', '_', color_name)
                 color_name = color_name.replace("__","_").lower()
@@ -246,7 +246,7 @@ def make_material_dict(root, msg):
         # #if prop:
         #             color_name = convert_german(occs.appearance.name).replace("Farbe - ","").replace("Color - ","")
         #             color_name = ("".join(re.findall(r"[A-Za-z0-9 ]*", color_name)))
-        #             color_name = re.sub('\s+',' ',color_name)
+        #             color_name = re.sub(r'\s+', ' ', color_name)
         #             color_name.strip()
         #             color_name = re.sub('[ :()]', '_', color_name)
         #             color_name = color_name.replace("__","_").lower()

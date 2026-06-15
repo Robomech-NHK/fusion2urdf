@@ -6,12 +6,6 @@
 import adsk, adsk.core, adsk.fusion, traceback
 import os
 import sys
-try:
-    import tkinter as tk
-except ImportError:
-    tk = None
-from .utils import utils
-from .core import Link, Joint, Write
 
 """
 # length unit is 'cm' and inertial unit is 'kg/cm^2'
@@ -36,9 +30,22 @@ def run(context):
         # initialize
         app = adsk.core.Application.get()
         ui = app.userInterface
+        title = 'Fusion2URDF'
+
+        try:
+            from .utils import utils
+            from .core import Link, Joint, Write
+        except Exception:
+            ui.messageBox('Import failed:\n{}'.format(traceback.format_exc()), title)
+            return
+
+        try:
+            import tkinter as tk
+        except Exception:
+            tk = None
+
         product = app.activeProduct
         design = adsk.fusion.Design.cast(product)
-        title = 'Fusion2URDF'
         if not design:
             ui.messageBox('No active Fusion design', title)
             return
@@ -59,28 +66,32 @@ def run(context):
         
         ros_selection_value = 1
         if tk is not None:
-            appWin = tk.Tk()
-            appWin.title("Choose your ROS Version")
-            # `-toolwindow` is a Windows-only Tk attribute. On macOS it can
-            # raise a TclError, so keep the dialog portable by falling back.
             try:
-                appWin.attributes('-toolwindow', True)
-            except tk.TclError:
-                pass
-            appWin.geometry('300x150')
+                appWin = tk.Tk()
+                appWin.title("Choose your ROS Version")
+                # `-toolwindow` is a Windows-only Tk attribute. On macOS it can
+                # raise a TclError, so keep the dialog portable by falling back.
+                try:
+                    appWin.attributes('-toolwindow', True)
+                except tk.TclError:
+                    pass
+                appWin.geometry('300x150')
 
-            ros_selection = tk.IntVar(value=1)
+                ros_selection = tk.IntVar(value=1)
 
-            def sel():
-                appWin.destroy()
-                appWin.quit()
+                def sel():
+                    appWin.destroy()
+                    appWin.quit()
 
-            tk.Radiobutton(appWin, text="ROS 1", font=('Aerial', 14), indicatoron=0, width=150, height=3,
-                           variable=ros_selection, value=1, command=sel).pack()
-            tk.Radiobutton(appWin, text="ROS 2", font=('Aerial', 14), indicatoron=0, width=150, height=3,
-                           variable=ros_selection, value=2, command=sel).pack()
-            appWin.mainloop()
-            ros_selection_value = ros_selection.get()
+                tk.Radiobutton(appWin, text="ROS 1", font=('Aerial', 14), indicatoron=0, width=150, height=3,
+                               variable=ros_selection, value=1, command=sel).pack()
+                tk.Radiobutton(appWin, text="ROS 2", font=('Aerial', 14), indicatoron=0, width=150, height=3,
+                               variable=ros_selection, value=2, command=sel).pack()
+                appWin.mainloop()
+                ros_selection_value = ros_selection.get()
+            except Exception:
+                # If Tk cannot be initialized on macOS, default to ROS 1.
+                ros_selection_value = 1
 
         
 
