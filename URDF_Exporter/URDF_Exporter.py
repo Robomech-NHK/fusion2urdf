@@ -64,34 +64,35 @@ def run(context):
             ui.messageBox('Fusion2URDF was canceled', title)
             return 0
         
-        ros_selection_value = 1
-        if tk is not None:
-            try:
-                appWin = tk.Tk()
-                appWin.title("Choose your ROS Version")
-                # `-toolwindow` is a Windows-only Tk attribute. On macOS it can
-                # raise a TclError, so keep the dialog portable by falling back.
-                try:
-                    appWin.attributes('-toolwindow', True)
-                except tk.TclError:
-                    pass
-                appWin.geometry('300x150')
+        # ros_selection_value = 1
+        # if tk is not None:
+        #     try:
+        #         appWin = tk.Tk()
+        #         appWin.title("Choose your ROS Version")
+        #         # `-toolwindow` is a Windows-only Tk attribute. On macOS it can
+        #         # raise a TclError, so keep the dialog portable by falling back.
+        #         try:
+        #             appWin.attributes('-toolwindow', True)
+        #         except tk.TclError:
+        #             pass
+        #         appWin.geometry('300x150')
 
-                ros_selection = tk.IntVar(value=1)
+        #         ros_selection = tk.IntVar(value=1)
 
-                def sel():
-                    appWin.destroy()
-                    appWin.quit()
+        #         def sel():
+        #             appWin.destroy()
+        #             appWin.quit()
 
-                tk.Radiobutton(appWin, text="ROS 1", font=('Aerial', 14), indicatoron=0, width=150, height=3,
-                               variable=ros_selection, value=1, command=sel).pack()
-                tk.Radiobutton(appWin, text="ROS 2", font=('Aerial', 14), indicatoron=0, width=150, height=3,
-                               variable=ros_selection, value=2, command=sel).pack()
-                appWin.mainloop()
-                ros_selection_value = ros_selection.get()
-            except Exception:
-                # If Tk cannot be initialized on macOS, default to ROS 1.
-                ros_selection_value = 1
+        #         tk.Radiobutton(appWin, text="ROS 1", font=('Aerial', 14), indicatoron=0, width=150, height=3,
+        #                        variable=ros_selection, value=1, command=sel).pack()
+        #         tk.Radiobutton(appWin, text="ROS 2", font=('Aerial', 14), indicatoron=0, width=150, height=3,
+        #                        variable=ros_selection, value=2, command=sel).pack()
+        #         appWin.mainloop()
+        #         ros_selection_value = ros_selection.get()
+        #     except Exception:
+        #         # If Tk cannot be initialized on macOS, default to ROS 1.
+        #         ros_selection_value = 1
+        ros_selection_value = 2
 
         
 
