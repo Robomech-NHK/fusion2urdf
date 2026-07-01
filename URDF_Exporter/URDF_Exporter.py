@@ -57,7 +57,9 @@ def run(context):
         # robot_name = root.name.split()[0].lower()
 
         doc = app.activeDocument
-        package_name = '_'.join(doc.name.split())
+
+        base_name = '_'.join(doc.name.split()).lower()
+        package_name = base_name
         robot_name = package_name
         save_dir = utils.file_dialog(ui)
         if save_dir == False:
